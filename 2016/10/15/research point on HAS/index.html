@@ -1,0 +1,782 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="HAS的初衷就是为了提高用户观看视频的体验，充分利用带宽状况来提供质量更好的视频。所以，关于HAS的研究以及部署，也都是围绕着提高用户的QoE(quality of experience)来做。总结下来有以下3个的研究方向：服务器、网络、客户端。下面就从这3个方面做详细的介绍。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HAS（HTTP Adaptive Streaming）研究热点总结">
+<meta property="og:url" content="http://yoursite.com/2016/10/15/research point on HAS/index.html">
+<meta property="og:site_name" content="October">
+<meta property="og:description" content="HAS的初衷就是为了提高用户观看视频的体验，充分利用带宽状况来提供质量更好的视频。所以，关于HAS的研究以及部署，也都是围绕着提高用户的QoE(quality of experience)来做。总结下来有以下3个的研究方向：服务器、网络、客户端。下面就从这3个方面做详细的介绍。">
+<meta property="og:updated_time" content="2016-10-15T07:23:35.475Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="HAS（HTTP Adaptive Streaming）研究热点总结">
+<meta name="twitter:description" content="HAS的初衷就是为了提高用户观看视频的体验，充分利用带宽状况来提供质量更好的视频。所以，关于HAS的研究以及部署，也都是围绕着提高用户的QoE(quality of experience)来做。总结下来有以下3个的研究方向：服务器、网络、客户端。下面就从这3个方面做详细的介绍。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/10/15/research point on HAS/"/>
+
+
+  <title> HAS（HTTP Adaptive Streaming）研究热点总结 | October </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?07fe700c8c6fc20f81eb814cbb9908cf";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">October</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-menu">
+          <a href="/menu" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th-list"></i> <br />
+            
+            目录
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                HAS（HTTP Adaptive Streaming）研究热点总结
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-10-15T15:12:58+08:00" content="2016-10-15">
+              2016-10-15
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/HAS/" itemprop="url" rel="index">
+                    <span itemprop="name">HAS</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>HAS的初衷就是为了提高用户观看视频的体验，充分利用带宽状况来提供质量更好的视频。所以，关于HAS的研究以及部署，也都是围绕着提高用户的QoE(quality of experience)来做。总结下来有以下3个的研究方向：<strong>服务器</strong>、<strong>网络</strong>、<strong>客户端</strong>。下面就从这3个方面做详细的介绍。<br><a id="more"></a></p>
+<h2 id="Part-1-服务器端"><a href="#Part-1-服务器端" class="headerlink" title="Part 1: 服务器端"></a>Part 1: 服务器端</h2><hr>
+<p>服务器作为视频内容提供环节，主要是涉及到视频内容准备的过程，包括以下几个方面。</p>
+<h3 id="one-layer-or-multi-layer-coding（单层-or-多层编码）"><a href="#one-layer-or-multi-layer-coding（单层-or-多层编码）" class="headerlink" title="one-layer or multi-layer coding（单层 or 多层编码）"></a>one-layer or multi-layer coding（单层 or 多层编码）</h3><p>HAS提供不同码率的实现方式也很多样，</p>
+<ul>
+<li>一是one-layer coding，就是通过调节编码参数来获取不同码率的视频，这种实现方式比较常见。</li>
+<li>二是multi-layer coding，这种实现是借助了SVC(scalable video coding)多层编码的特性。</li>
+</ul>
+<p>one-layer coding的适应算法在下面会有详解，此处简单介绍下DASH-SVC方案。<br>SVC（scalable video coding）可以提供一个<strong>base layer</strong>和一个或多个<strong>enhance layer</strong>，其适应算法有以下经验，</p>
+<ul>
+<li>首先保证了base layer的传输就保证了视频的流畅播放，如果带宽状况允许的话，再请求enhance layer来提高视频的质量</li>
+<li>base layer improving is more import than higher quality layers（提升基本层优于提升增强层）</li>
+<li>higher quality in the end of a video clip leads to higher QoE</li>
+</ul>
+<h3 id="preparation-of-the-content（视频内容呈现方式）"><a href="#preparation-of-the-content（视频内容呈现方式）" class="headerlink" title="preparation of the content（视频内容呈现方式）"></a>preparation of the content（视频内容呈现方式）</h3><p>视频内容呈现方式包括以下研究点，</p>
+<blockquote>
+<p>segment length（1s - 15s)</p>
+</blockquote>
+<ul>
+<li><strong>large segment</strong>的话可以提高编码的效率，相同的bit rate可以提供质量更好的视频。</li>
+<li>但是，<strong>large segment</strong>会增加播放延迟、更长的初始化时间、对带宽播放反应滞后。</li>
+<li>对于直播，由于要求低延迟，一定要用<strong>small segment</strong>（延迟随segment size直线下降，130ms的segment可以获得1s左右的延迟）</li>
+<li>当然，segment size的下降必然会增加HTTP请求，增加了额外的网络负担。</li>
+</ul>
+<blockquote>
+<p>available bit rate</p>
+</blockquote>
+<ul>
+<li>太过多的bit rate必定会增加编码耗时以及服务器存储负担（点播）</li>
+<li>典型的实现方式（Youtube）是<strong>5种</strong>bit rate</li>
+</ul>
+<h3 id="adaptation-dimension-多码率实现方式"><a href="#adaptation-dimension-多码率实现方式" class="headerlink" title="adaptation dimension(多码率实现方式)"></a>adaptation dimension(多码率实现方式)</h3><p>在视频编码中可以通过以下三个维度来实现编码视频码率的下降，frame rate、resolution、QP，这一部分和视频编码中QoE和bit rate的研究完全一致，简单介绍如下，</p>
+<blockquote>
+<p>temporal adaptation: frame rate</p>
+</blockquote>
+<ul>
+<li>in order to achieve 80% of original bitrate, need to reduce 60% frame rate. quality degradation is significant.</li>
+<li>reduction of frame rate has little impact on high motion videos.</li>
+</ul>
+<blockquote>
+<p>spatial adaptation: resolution</p>
+</blockquote>
+<ul>
+<li>spatial resolution is the key criteration for QoE for small screen</li>
+<li>impact of resolution depends mainly on the content and the device</li>
+<li>for the same video bit rate, higher resolution is perceived worse</li>
+</ul>
+<blockquote>
+<p>image quality adaptation: QP</p>
+</blockquote>
+<ul>
+<li>decrease bit rate by 30% without any loss in quality(paper:Optimizing video coding adaptive streaming over HTTP)</li>
+<li>increasing bit rate the video quality increases but eventually saturates.</li>
+</ul>
+<blockquote>
+<p>multiple dimensions</p>
+</blockquote>
+<ul>
+<li>通过以上多个参数配合来调节bit rate</li>
+<li>there exists an encoding which maximizes the user-perceived quality for a given target bit rate.（paper: User perception of adaptive video quality)</li>
+<li>fast foreground motion like soccer reducing frame is preferred to reducing frame quality</li>
+</ul>
+<h2 id="Part-2-网络"><a href="#Part-2-网络" class="headerlink" title="Part 2: 网络"></a>Part 2: 网络</h2><hr>
+<p>网络这个层次上的研究包含两个大的方面，<strong>网络层次的适应算法</strong>、<strong>网络带宽竞争机制</strong>。<br><strong>网络层次的适应算法</strong>,指在网络上重定向客户端的bit rate请求，来获取一个整体的QoE提升。<br><strong>网络带宽竞争机制</strong>包括多个播放器竞争的公平机制以及播放器和其他上网应用之间的竞争。</p>
+<h3 id="Interactions-between-network-entities"><a href="#Interactions-between-network-entities" class="headerlink" title="Interactions between network entities"></a>Interactions between network entities</h3><p>本节涉及到较多了TCP传输协议知识，现在并不能很好的理解。</p>
+<blockquote>
+<p>Interactions between HAS Players</p>
+</blockquote>
+<p>对于同一个网络中存在多个播放器的情况，有以下三个方面的问题需要考虑，stability、fairness and bandwidth utilization</p>
+<ul>
+<li>播放器之间能否分享网络，并维持一个稳定的状态（没有太多的码率切换）？</li>
+<li>播放器之间能否公平的分享网络带宽？</li>
+<li>多个播放器的竞争会不会降低网络带宽的利用率？</li>
+</ul>
+<blockquote>
+<p>Interactions between HAS Players and other applications</p>
+</blockquote>
+<p>这一方面的研究不足。</p>
+<blockquote>
+<p>Interactions between other applications and HAS Players</p>
+</blockquote>
+<p>aggressive player对其他上网应用的影响，</p>
+<ul>
+<li>由于有很多的HTTP request of small files，会导致排队时间增长，严重影响大文件的传输以及实时的应用。</li>
+</ul>
+<blockquote>
+<p>Interactions between HAS Players and TCP</p>
+</blockquote>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>上一节介绍了由于竞争网络带宽带来的一些问题，本节就来介绍一些解决方案，存在以下三个方面的解决方案，</p>
+<blockquote>
+<p>server based approaches</p>
+</blockquote>
+<p>后续补充。</p>
+<blockquote>
+<p>network based approaches</p>
+</blockquote>
+<p><strong>SDN</strong>(software defined network)可以重定向HAS请求，基于此可以做一些网络上的适应算法。</p>
+<blockquote>
+<p>proxy and client based approaches</p>
+</blockquote>
+<p>通过一个上层的proxy server来分配带宽，或者，让多个client之间互相通信，了解对方的带宽状况，从而解决上一节遇到的问题。</p>
+<h2 id="Part-3-客户端"><a href="#Part-3-客户端" class="headerlink" title="Part 3: 客户端"></a>Part 3: 客户端</h2><hr>
+<p>客户端涉及到<strong>adaptation algo.</strong>，这一块MPEG-DASH标准并没有做规定，所以在这块的研究也最为火热，这一块的研究可以分为影响QoE的因素和参与adaptation algo.的参数两个方面进行分解。</p>
+<h3 id="影响QoE的因素"><a href="#影响QoE的因素" class="headerlink" title="影响QoE的因素"></a>影响QoE的因素</h3><p>影响QoE的因素包括<strong>init delay</strong>、<strong>representation switch events</strong>、<strong>stalling</strong>、<strong>media throughput</strong>、<strong>network utilisation</strong>等几个因素，研究多是针对前三个因素，后边两个因素常用作评价标准，在优化前三个因素的基础上，最大化后边2个因素是自适应码率算法的追求目标。</p>
+<blockquote>
+<p>init delay</p>
+</blockquote>
+<ul>
+<li>跟segment size &amp; init buffer直接相关</li>
+<li>小的init buffer可以降低init delay，但是会增加播放后stalling的可能性</li>
+<li>playout buffer可以抵消临时的带宽波动，使得播放更加平滑</li>
+<li>the impact of init delays on QoE of video streaming is not severe.</li>
+</ul>
+<blockquote>
+<p>representation switch events</p>
+</blockquote>
+<ul>
+<li>降低视频质量的影响比提升视频质量的影响大，有研究表明，<strong>突然提高视频质量反而会提升QoE</strong>，因为用户更愿意看到视频质量提升。（paper: Representation switch smoothing for adaptive HTTP streaming）</li>
+<li>逐渐切换可以降低切换对QoE的影响，switching amplitude and recency effects can be neglected if more than two switches occur</li>
+<li><strong>相对于切换频率，长时间播放低质量视频会更加影响QoE</strong>（Assessing  effect sizes of influence factors towards a QoE model for HTTP adaptive streaming)</li>
+</ul>
+<blockquote>
+<p>stalling</p>
+</blockquote>
+<ul>
+<li>large buffer: 需要更多的内存（对于移动设备不合适） &amp; 更长的初始化等待</li>
+</ul>
+<h3 id="parameters-of-adaptation-algo"><a href="#parameters-of-adaptation-algo" class="headerlink" title="parameters of adaptation algo."></a>parameters of adaptation algo.</h3><p>当前常见的算法多采用如下几个系统参数来作为adaptation algo.的输入参数，<strong>预测带宽</strong>、<strong>video buffer size</strong>等。下面结合多种adaptation algo.来介绍这几个参数的运用，</p>
+<blockquote>
+<p>bandwidth estimation algo.</p>
+</blockquote>
+<ul>
+<li>（paper: Review of bandwidth estimation tools and application to bandwidth adaptive video streaming)</li>
+<li>可以分为passive &amp; active measurement两种预测方式，active measurement需要额外的probe packet，HAS多是采用passive的方式</li>
+</ul>
+<blockquote>
+<p>adaptation algo.</p>
+</blockquote>
+<p>具体的adaptation algo.以后会分专题讲解，此文只讲一些概括性的东西。由于其发展的很快，所以我都是重点关注些最新的算法。</p>
+<ul>
+<li>Pipelined DASH: several segment can be requested at a time</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>国庆假期看了些关于HAS领域概括性的文章，特将研究热点总结出来，供交流讨论及自己以后翻看。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://oe1w1bbwt.bkt.clouddn.com/hexo/blog/alipay.png" alt="Tony WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://oe1w1bbwt.bkt.clouddn.com/hexo/blog/alipay.png" alt="Tony Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/14/hello-world/" rel="next" title="Hello World">
+                <i class="fa fa-chevron-left"></i> Hello World
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://oe1w1bbwt.bkt.clouddn.com/avatar.jpg"
+               alt="Tony" />
+          <p class="site-author-name" itemprop="name">Tony</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">2</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/NiceTony" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/nicetony1991" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Part-1-服务器端"><span class="nav-number">1.</span> <span class="nav-text">Part 1: 服务器端</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#one-layer-or-multi-layer-coding（单层-or-多层编码）"><span class="nav-number">1.1.</span> <span class="nav-text">one-layer or multi-layer coding（单层 or 多层编码）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#preparation-of-the-content（视频内容呈现方式）"><span class="nav-number">1.2.</span> <span class="nav-text">preparation of the content（视频内容呈现方式）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#adaptation-dimension-多码率实现方式"><span class="nav-number">1.3.</span> <span class="nav-text">adaptation dimension(多码率实现方式)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Part-2-网络"><span class="nav-number">2.</span> <span class="nav-text">Part 2: 网络</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Interactions-between-network-entities"><span class="nav-number">2.1.</span> <span class="nav-text">Interactions between network entities</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决方案"><span class="nav-number">2.2.</span> <span class="nav-text">解决方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Part-3-客户端"><span class="nav-number">3.</span> <span class="nav-text">Part 3: 客户端</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#影响QoE的因素"><span class="nav-number">3.1.</span> <span class="nav-text">影响QoE的因素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#parameters-of-adaptation-algo"><span class="nav-number">3.2.</span> <span class="nav-text">parameters of adaptation algo.</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tony</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
