@@ -1,12 +1,392 @@
-<?xml version="1.0" encoding="utf-8"?>
-<search>
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="HAS," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="http://oe1w1bbwt.bkt.clouddn.com/hexo/blog/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="libdash是bitmovin公司开源的一个DASH库，完整实现了DASH协议，可以在Github上获取其代码。同时，该开源库还基于QT开发了一个播放器，之前做DASH自适应算法的时候，在该实例播放器上实现过算法，也对该播放器的代码结构较为熟悉，特记录下来，本文将主要针对设计自适应算法部分的代码。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【HAS】DASH库libdash代码结构解析">
+<meta property="og:url" content="http://yoursite.com/2017/03/04/【HAS】DASH库libdash代码结构解析/index.html">
+<meta property="og:site_name" content="October">
+<meta property="og:description" content="libdash是bitmovin公司开源的一个DASH库，完整实现了DASH协议，可以在Github上获取其代码。同时，该开源库还基于QT开发了一个播放器，之前做DASH自适应算法的时候，在该实例播放器上实现过算法，也对该播放器的代码结构较为熟悉，特记录下来，本文将主要针对设计自适应算法部分的代码。">
+<meta property="og:image" content="http://oe1w1bbwt.bkt.clouddn.com/blog/libdash/libdash.png">
+<meta property="og:updated_time" content="2017-03-03T17:26:27.221Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【HAS】DASH库libdash代码结构解析">
+<meta name="twitter:description" content="libdash是bitmovin公司开源的一个DASH库，完整实现了DASH协议，可以在Github上获取其代码。同时，该开源库还基于QT开发了一个播放器，之前做DASH自适应算法的时候，在该实例播放器上实现过算法，也对该播放器的代码结构较为熟悉，特记录下来，本文将主要针对设计自适应算法部分的代码。">
+<meta name="twitter:image" content="http://oe1w1bbwt.bkt.clouddn.com/blog/libdash/libdash.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/04/【HAS】DASH库libdash代码结构解析/"/>
+
+
+
+
+
+  <title> 【HAS】DASH库libdash代码结构解析 | October </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?07fe700c8c6fc20f81eb814cbb9908cf";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
   
   
     
-    <entry>
-      <title><![CDATA[【HAS】DASH库libdash代码结构解析]]></title>
-      <url>http://yoursite.com/2017/03/04/%E3%80%90HAS%E3%80%91DASH%E5%BA%93libdash%E4%BB%A3%E7%A0%81%E7%BB%93%E6%9E%84%E8%A7%A3%E6%9E%90/</url>
-      <content type="html"><![CDATA[<p><strong>libdash</strong>是bitmovin公司开源的一个DASH库，完整实现了DASH协议，可以在<a href="https://github.com/bitmovin/libdash" target="_blank" rel="external">Github</a>上获取其代码。同时，该开源库还基于QT开发了一个播放器，之前做DASH自适应算法的时候，在该实例播放器上实现过算法，也对该播放器的代码结构较为熟悉，特记录下来，本文将主要针对设计自适应算法部分的代码。</p>
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">October</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/menu" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/04/【HAS】DASH库libdash代码结构解析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Tony">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://oe1w1bbwt.bkt.clouddn.com/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="October">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                【HAS】DASH库libdash代码结构解析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-04T01:19:58+08:00">
+                2017-03-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HAS/" itemprop="url" rel="index">
+                    <span itemprop="name">HAS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/03/04/【HAS】DASH库libdash代码结构解析/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/04/【HAS】DASH库libdash代码结构解析/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/03/04/【HAS】DASH库libdash代码结构解析/" class="leancloud_visitors" data-flag-title="【HAS】DASH库libdash代码结构解析">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>libdash</strong>是bitmovin公司开源的一个DASH库，完整实现了DASH协议，可以在<a href="https://github.com/bitmovin/libdash" target="_blank" rel="external">Github</a>上获取其代码。同时，该开源库还基于QT开发了一个播放器，之前做DASH自适应算法的时候，在该实例播放器上实现过算法，也对该播放器的代码结构较为熟悉，特记录下来，本文将主要针对设计自适应算法部分的代码。</p>
 <a id="more"></a>
 <h3 id="整体结构"><a href="#整体结构" class="headerlink" title="整体结构"></a>整体结构</h3><p><img src="http://oe1w1bbwt.bkt.clouddn.com/blog/libdash/libdash.png" alt="enter image description here"></p>
 <h3 id="每一个类的作用"><a href="#每一个类的作用" class="headerlink" title="每一个类的作用"></a>每一个类的作用</h3><h4 id="1-DASHPlayer"><a href="#1-DASHPlayer" class="headerlink" title="1. DASHPlayer"></a>1. DASHPlayer</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> DASHPlayer : <span class="keyword">public</span> IDASHPlayerGuiObserver, <span class="keyword">public</span> managers::IMultimediaManagerObserver</div></pre></td></tr></table></figure>
@@ -37,200 +417,521 @@
 <p>到此处，涉及到自适应逻辑的每一个类都讲过了，那么，自适应逻辑该加在什么地方呢？其实可以加的地方还是蛮多的，而且，对性能影响也不大，如果设计的是，每下载完一个segment做一次逻辑的话，可以放在<code>OnSegmentDownloaded</code>这个函数里，我是将逻辑放在<code>MultimediaManger</code>中的，因为涉及到音频流和视频流，要做一次流判断，可以在<code>MultimediaManger</code>的<code>OnSegmentDownloaded</code>中如下添加代码，</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">void</span>    MultimediaManager::OnSegmentDownloaded              (StreamType type, <span class="keyword">double</span> current_bandwidth)</div><div class="line">&#123;</div><div class="line">    <span class="keyword">this</span>-&gt;segmentsDownloaded++;</div><div class="line"></div><div class="line">    estimate_bandwidth.push_back(current_bandwidth);</div><div class="line"></div><div class="line">    <span class="keyword">switch</span> (type)</div><div class="line">    &#123;</div><div class="line">        <span class="keyword">case</span> AUDIO:</div><div class="line">            <span class="keyword">this</span>-&gt;audioLogic-&gt;EstimateBandwidth(estimate_bandwidth);</div><div class="line">            <span class="keyword">this</span>-&gt;audioLogic-&gt;DoLogic();</div><div class="line">            <span class="keyword">this</span>-&gt;SetAudioQuality(<span class="keyword">this</span>-&gt;period, <span class="keyword">this</span>-&gt;audioLogic-&gt;GetAdaptationSet(), <span class="keyword">this</span>-&gt;audioLogic-&gt;GetRepresentation());</div><div class="line">            <span class="keyword">break</span>;</div><div class="line">        <span class="keyword">case</span> VIDEO:</div><div class="line">            <span class="keyword">this</span>-&gt;videoLogic-&gt;EstimateBandwidth(estimate_bandwidth);</div><div class="line">            <span class="keyword">this</span>-&gt;videoLogic-&gt;DoLogic();</div><div class="line">            <span class="keyword">this</span>-&gt;SetVideoQuality(<span class="keyword">this</span>-&gt;period, <span class="keyword">this</span>-&gt;videoLogic-&gt;GetAdaptationSet(), <span class="keyword">this</span>-&gt;videoLogic-&gt;GetRepresentation());</div><div class="line">            <span class="keyword">break</span>;</div><div class="line">        <span class="keyword">default</span>:</div><div class="line">            <span class="keyword">break</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>我在自己的<a href="https://github.com/NiceTony/libdash.git" target="_blank" rel="external">Github</a>仓库里，大概把该有的内容都添加进来了，只需要在逻辑类做相应的实现即可，现在逻辑类可以获取的参数有，buffer的状态以及预测带宽，这两块的具体实现以及自适应算法的实现都很有意义，欢迎大家一起来研究讨论这些问题。</p>
-]]></content>
-    </entry>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HAS/" rel="tag"># HAS</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/11/【生活感悟】Github博客一些常用操作/" rel="next" title="【生活感悟】Github博客一些常用操作">
+                <i class="fa fa-chevron-left"></i> 【生活感悟】Github博客一些常用操作
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+  <p>热评文章</p>
+  <div class="ds-top-threads" data-range="weekly" data-num-items="4"></div>
+
+
+          
+  <div class="comments" id="comments">
     
-    <entry>
-      <title><![CDATA[【生活感悟】Github博客一些常用操作]]></title>
-      <url>http://yoursite.com/2017/01/11/%E3%80%90%E7%94%9F%E6%B4%BB%E6%84%9F%E6%82%9F%E3%80%91Github%E5%8D%9A%E5%AE%A2%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/</url>
-      <content type="html"><![CDATA[<p>之前还一直觉得自己在别的平台上发布博客要方便些，自己要管理的话比较麻烦，好久没有写博客，今晚写了一篇博客之后，发现其实并没有那么复杂。之前还担心环境迁移的问题，现在也成功解决了，所以决定以后就在自己的空间来更新博客了，满满的Geek范，主要是还没有广告。这边文章主要记录一些更新博客中常用的操作，供今后更新时候查阅。</p>
-<a id="more"></a>
-<h2 id="迁移环境"><a href="#迁移环境" class="headerlink" title="迁移环境"></a>迁移环境</h2><p>本篇文章不涉及到如何在GitHub上搭建个人博客，如果需要的话可以参考教程<a href="http://wuxiaolong.me/2015/07/31/build-blog-by-hexo/" target="_blank" rel="external">吴小龙的博客</a>，这里只涉及到建好之后的一些常用操作。</p>
-<p>GitHub博客是有一堆开发文件的，包括主题了之类的，迁移的话，可以简单的把所有范文件复制到新的电脑上就可以了，不过需要在新的电脑上也配置一下Hexo环境，这个部分在上面推荐的博客里有。</p>
-<h2 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h2><pre><code>hexo help #查看帮助
-hexo init #初始化一个目录
-hexo new &quot;postName&quot; #新建文章
-hexo new page &quot;pageName&quot; #新建页面
-hexo generate #生成网页，可以在 public 目录查看整个网站的文件
-hexo server #本地预览，&apos;Ctrl+C&apos;关闭
-hexo deploy #部署.deploy目录
-hexo clean #清除缓存，**强烈建议每次执行命令前先清理缓存，每次部署前先删除 .deploy 文件夹**
-</code></pre><p>有几个操作可以简化为</p>
-<pre><code>hexo n == hexo new
-hexo g == hexo generate
-hexo s == hexo server
-hexo d == hexo deploy
-</code></pre><p>编辑文章的话直接在<code>source/_posts</code>对应的文件里修改就好了，其他几个页面的话，也在相应的目录下的文件里修改即可。</p>
-<p>如果要生成一个新的Page，用上边的新建页面命令就好了。</p>
-]]></content>
-    </entry>
+      <div class="ds-thread" data-thread-key="2017/03/04/【HAS】DASH库libdash代码结构解析/"
+           data-title="【HAS】DASH库libdash代码结构解析" data-url="http://yoursite.com/2017/03/04/【HAS】DASH库libdash代码结构解析/">
+      </div>
     
-    <entry>
-      <title><![CDATA[【生活感悟】在创业公司实习的这20天]]></title>
-      <url>http://yoursite.com/2017/01/11/%E3%80%90%E7%94%9F%E6%B4%BB%E6%84%9F%E6%82%9F%E3%80%91%E5%9C%A8%E5%88%9B%E4%B8%9A%E5%85%AC%E5%8F%B8%E5%AE%9E%E4%B9%A0%E7%9A%84%E8%BF%9920%E5%A4%A9/</url>
-      <content type="html"><![CDATA[<p>从2016-12-19号开始去师兄的公司实习，当时师兄和导师征求了下意见，老师说我没有问题的话就可以过去，然后我就开始了在师兄公司的实习经历，算是自己职业生涯中第一份履历了，最近也颇有一些感悟，所以记录下来。</p>
-<a id="more"></a>
-<h2 id="一些基本的事情"><a href="#一些基本的事情" class="headerlink" title="一些基本的事情"></a>一些基本的事情</h2><p>从北大到公司需要一个小时，早上理论上需要9:30到公司，开始我都是9点多点儿到，后来越来越晚，现在经常10点到的情况也是有的。公司在中关村东升科技园，东升科技园应该算是科技创新企业集中的园区，我们所在的泰利驿站算是初创企业的集中营，里边零零散散的分布着很多的公司，公司在泰利驿站里占据着西北角，现在大概有9个工位的样子，公司有4名核心技术人员，3名实习生，和两名负责市场的师姐。在公司吃饭是有一些贵的，大概在15-20之间，总体要比在学校吃贵80%的样子。在公司我终于坐上了喜欢的工位，要是在实验室也有这么宽敞的工位就好了。</p>
-<p><img src="http://oe1w1bbwt.bkt.clouddn.com/20170111/QQ%E5%9B%BE%E7%89%8720170111222834.jpg" alt=""></p>
-<p>右边的摄像头就是我们公司的产品了，全景的摄像机，主要是有两位小米过来的硬件工程师设计开发的，再配合上公司的软件，就可以实现全景视频的系统了。我在公司主要是参与软件部分的维护，以及一些公司网站的事情。</p>
-<h2 id="实习的感受"><a href="#实习的感受" class="headerlink" title="实习的感受"></a>实习的感受</h2><p>首先，公司的氛围的话，还是蛮不错的，平时交流不多，大家都有自己负责的部分，各忙各的。工作的大环境稍微有些吵，隔壁好像是做企业网络办公产品的，经常讨论些网页、excel之类的，氛围跟我们完全不一样，他们的老大好像也是北大毕业的，经常给其他人分配任务，甚至教大家如何实现git之类的事情，感觉比我们low多了。</p>
-<p>然后，手头上的事情话，今天刚刚解决了一个推流的小bug，算是在公司达成的第一个小成就。其他部分就是从过来就开始准备实现的，给我们的系统增加音频部分，还有很多的路要走，准备先在自己的小系统上实现一下，移植过去应该要简单些，以前并没有接触过类似的工作。感觉今后还可以慢慢的给自己的小系统增加功能，可以增加一些物体检测之类的算法，不断的砌砖，以后开源出来供初学者学习也很不错。</p>
-<p>公司的娱乐活动的话不多，大家最常做的娱乐活动就是天气好的话，午饭以后一起在园区里散散步，吹吹风（寒风），畅想畅想公司的未来。不过，圣诞的时候，大家一起在师兄家嗨皮了一把，玩德州扑克第一个把所有筹码输光，感受了一把xbox，还是蛮不错的，听beast+的蓝牙音箱，玩了很久的只言片语，还是蛮开心的。</p>
-<p><img src="http://oe1w1bbwt.bkt.clouddn.com/20170111/QQ%E5%9B%BE%E7%89%8720170111222821.jpg" alt=""></p>
-<p>最近的生活状态呢，基本上属于按时打卡型的，早上9点多到，晚上7点多回来，在学校的学五食堂吃吃晚饭，回宿舍充充电（学些机器学习入门的东西），很轻松，慢慢的也适应了这种生活，刚刚开始的时候还觉得超级累呢，而其每天挤公交都觉得生活特别无望，现在慢慢的都习惯了，感觉最近成熟了很多。</p>
-<h2 id="写在最后的话"><a href="#写在最后的话" class="headerlink" title="写在最后的话"></a>写在最后的话</h2><p>2017年也开始一周多了，这一年注定要发生很多的大事，做出一些重要的决定，是不是要出国或者留在学校读博士呢，能不能转到一个合适的研究方向上去呢，能不能找到一个称心如意的女朋友呢，甚至，可不可以找到一份好的工作呢。不过每一个都特别期待，也相信生活会很美好的，2017以来，开心起来，拥抱未来。</p>
-]]></content>
-    </entry>
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://oe1w1bbwt.bkt.clouddn.com/avatar.jpg"
+               alt="Tony" />
+          <p class="site-author-name" itemprop="name">Tony</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/menu">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/NiceTony" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/nicetony1991" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#整体结构"><span class="nav-number">1.</span> <span class="nav-text">整体结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#每一个类的作用"><span class="nav-number">2.</span> <span class="nav-text">每一个类的作用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-DASHPlayer"><span class="nav-number">2.1.</span> <span class="nav-text">1. DASHPlayer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-MultimediaManager"><span class="nav-number">2.2.</span> <span class="nav-text">2. MultimediaManager</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-MultimediaStream"><span class="nav-number">2.3.</span> <span class="nav-text">3. MultimediaStream</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-DASHManger"><span class="nav-number">2.4.</span> <span class="nav-text">4. DASHManger</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-DASHReceiver"><span class="nav-number">2.5.</span> <span class="nav-text">5. DASHReceiver</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tony</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/NiceTony/next.git">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
     
-    <entry>
-      <title><![CDATA[【HAS】HAS（HTTP Adaptive Streaming）研究热点总结]]></title>
-      <url>http://yoursite.com/2016/10/15/research%20point%20on%20HAS/</url>
-      <content type="html"><![CDATA[<p>HAS的初衷就是为了提高用户观看视频的体验，充分利用带宽状况来提供质量更好的视频。所以，关于HAS的研究以及部署，也都是围绕着提高用户的QoE(quality of experience)来做。总结下来有以下3个的研究方向：<strong>服务器</strong>、<strong>网络</strong>、<strong>客户端</strong>。下面就从这3个方面做详细的介绍。<br><a id="more"></a></p>
-<h2 id="Part-1-服务器端"><a href="#Part-1-服务器端" class="headerlink" title="Part 1: 服务器端"></a>Part 1: 服务器端</h2><hr>
-<p>服务器作为视频内容提供环节，主要是涉及到视频内容准备的过程，包括以下几个方面。</p>
-<h3 id="one-layer-or-multi-layer-coding（单层-or-多层编码）"><a href="#one-layer-or-multi-layer-coding（单层-or-多层编码）" class="headerlink" title="one-layer or multi-layer coding（单层 or 多层编码）"></a>one-layer or multi-layer coding（单层 or 多层编码）</h3><p>HAS提供不同码率的实现方式也很多样，</p>
-<ul>
-<li>一是one-layer coding，就是通过调节编码参数来获取不同码率的视频，这种实现方式比较常见。</li>
-<li>二是multi-layer coding，这种实现是借助了SVC(scalable video coding)多层编码的特性。</li>
-</ul>
-<p>one-layer coding的适应算法在下面会有详解，此处简单介绍下DASH-SVC方案。<br>SVC（scalable video coding）可以提供一个<strong>base layer</strong>和一个或多个<strong>enhance layer</strong>，其适应算法有以下经验，</p>
-<ul>
-<li>首先保证了base layer的传输就保证了视频的流畅播放，如果带宽状况允许的话，再请求enhance layer来提高视频的质量</li>
-<li>base layer improving is more import than higher quality layers（提升基本层优于提升增强层）</li>
-<li>higher quality in the end of a video clip leads to higher QoE</li>
-</ul>
-<h3 id="preparation-of-the-content（视频内容呈现方式）"><a href="#preparation-of-the-content（视频内容呈现方式）" class="headerlink" title="preparation of the content（视频内容呈现方式）"></a>preparation of the content（视频内容呈现方式）</h3><p>视频内容呈现方式包括以下研究点，</p>
-<blockquote>
-<p>segment length（1s - 15s)</p>
-</blockquote>
-<ul>
-<li><strong>large segment</strong>的话可以提高编码的效率，相同的bit rate可以提供质量更好的视频。</li>
-<li>但是，<strong>large segment</strong>会增加播放延迟、更长的初始化时间、对带宽播放反应滞后。</li>
-<li>对于直播，由于要求低延迟，一定要用<strong>small segment</strong>（延迟随segment size直线下降，130ms的segment可以获得1s左右的延迟）</li>
-<li>当然，segment size的下降必然会增加HTTP请求，增加了额外的网络负担。</li>
-</ul>
-<blockquote>
-<p>available bit rate</p>
-</blockquote>
-<ul>
-<li>太过多的bit rate必定会增加编码耗时以及服务器存储负担（点播）</li>
-<li>典型的实现方式（Youtube）是<strong>5种</strong>bit rate</li>
-</ul>
-<h3 id="adaptation-dimension-多码率实现方式"><a href="#adaptation-dimension-多码率实现方式" class="headerlink" title="adaptation dimension(多码率实现方式)"></a>adaptation dimension(多码率实现方式)</h3><p>在视频编码中可以通过以下三个维度来实现编码视频码率的下降，frame rate、resolution、QP，这一部分和视频编码中QoE和bit rate的研究完全一致，简单介绍如下，</p>
-<blockquote>
-<p>temporal adaptation: frame rate</p>
-</blockquote>
-<ul>
-<li>in order to achieve 80% of original bitrate, need to reduce 60% frame rate. quality degradation is significant.</li>
-<li>reduction of frame rate has little impact on high motion videos.</li>
-</ul>
-<blockquote>
-<p>spatial adaptation: resolution</p>
-</blockquote>
-<ul>
-<li>spatial resolution is the key criteration for QoE for small screen</li>
-<li>impact of resolution depends mainly on the content and the device</li>
-<li>for the same video bit rate, higher resolution is perceived worse</li>
-</ul>
-<blockquote>
-<p>image quality adaptation: QP</p>
-</blockquote>
-<ul>
-<li>decrease bit rate by 30% without any loss in quality(paper:Optimizing video coding adaptive streaming over HTTP)</li>
-<li>increasing bit rate the video quality increases but eventually saturates.</li>
-</ul>
-<blockquote>
-<p>multiple dimensions</p>
-</blockquote>
-<ul>
-<li>通过以上多个参数配合来调节bit rate</li>
-<li>there exists an encoding which maximizes the user-perceived quality for a given target bit rate.（paper: User perception of adaptive video quality)</li>
-<li>fast foreground motion like soccer reducing frame is preferred to reducing frame quality</li>
-</ul>
-<h2 id="Part-2-网络"><a href="#Part-2-网络" class="headerlink" title="Part 2: 网络"></a>Part 2: 网络</h2><hr>
-<p>网络这个层次上的研究包含两个大的方面，<strong>网络层次的适应算法</strong>、<strong>网络带宽竞争机制</strong>。<br><strong>网络层次的适应算法</strong>,指在网络上重定向客户端的bit rate请求，来获取一个整体的QoE提升。<br><strong>网络带宽竞争机制</strong>包括多个播放器竞争的公平机制以及播放器和其他上网应用之间的竞争。</p>
-<h3 id="Interactions-between-network-entities"><a href="#Interactions-between-network-entities" class="headerlink" title="Interactions between network entities"></a>Interactions between network entities</h3><p>本节涉及到较多了TCP传输协议知识，现在并不能很好的理解。</p>
-<blockquote>
-<p>Interactions between HAS Players</p>
-</blockquote>
-<p>对于同一个网络中存在多个播放器的情况，有以下三个方面的问题需要考虑，stability、fairness and bandwidth utilization</p>
-<ul>
-<li>播放器之间能否分享网络，并维持一个稳定的状态（没有太多的码率切换）？</li>
-<li>播放器之间能否公平的分享网络带宽？</li>
-<li>多个播放器的竞争会不会降低网络带宽的利用率？</li>
-</ul>
-<blockquote>
-<p>Interactions between HAS Players and other applications</p>
-</blockquote>
-<p>这一方面的研究不足。</p>
-<blockquote>
-<p>Interactions between other applications and HAS Players</p>
-</blockquote>
-<p>aggressive player对其他上网应用的影响，</p>
-<ul>
-<li>由于有很多的HTTP request of small files，会导致排队时间增长，严重影响大文件的传输以及实时的应用。</li>
-</ul>
-<blockquote>
-<p>Interactions between HAS Players and TCP</p>
-</blockquote>
-<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>上一节介绍了由于竞争网络带宽带来的一些问题，本节就来介绍一些解决方案，存在以下三个方面的解决方案，</p>
-<blockquote>
-<p>server based approaches</p>
-</blockquote>
-<p>后续补充。</p>
-<blockquote>
-<p>network based approaches</p>
-</blockquote>
-<p><strong>SDN</strong>(software defined network)可以重定向HAS请求，基于此可以做一些网络上的适应算法。</p>
-<blockquote>
-<p>proxy and client based approaches</p>
-</blockquote>
-<p>通过一个上层的proxy server来分配带宽，或者，让多个client之间互相通信，了解对方的带宽状况，从而解决上一节遇到的问题。</p>
-<h2 id="Part-3-客户端"><a href="#Part-3-客户端" class="headerlink" title="Part 3: 客户端"></a>Part 3: 客户端</h2><hr>
-<p>客户端涉及到<strong>adaptation algo.</strong>，这一块MPEG-DASH标准并没有做规定，所以在这块的研究也最为火热，这一块的研究可以分为影响QoE的因素和参与adaptation algo.的参数两个方面进行分解。</p>
-<h3 id="影响QoE的因素"><a href="#影响QoE的因素" class="headerlink" title="影响QoE的因素"></a>影响QoE的因素</h3><p>影响QoE的因素包括<strong>init delay</strong>、<strong>representation switch events</strong>、<strong>stalling</strong>、<strong>media throughput</strong>、<strong>network utilisation</strong>等几个因素，研究多是针对前三个因素，后边两个因素常用作评价标准，在优化前三个因素的基础上，最大化后边2个因素是自适应码率算法的追求目标。</p>
-<blockquote>
-<p>init delay</p>
-</blockquote>
-<ul>
-<li>跟segment size &amp; init buffer直接相关</li>
-<li>小的init buffer可以降低init delay，但是会增加播放后stalling的可能性</li>
-<li>playout buffer可以抵消临时的带宽波动，使得播放更加平滑</li>
-<li>the impact of init delays on QoE of video streaming is not severe.</li>
-</ul>
-<blockquote>
-<p>representation switch events</p>
-</blockquote>
-<ul>
-<li>降低视频质量的影响比提升视频质量的影响大，有研究表明，<strong>突然提高视频质量反而会提升QoE</strong>，因为用户更愿意看到视频质量提升。（paper: Representation switch smoothing for adaptive HTTP streaming）</li>
-<li>逐渐切换可以降低切换对QoE的影响，switching amplitude and recency effects can be neglected if more than two switches occur</li>
-<li><strong>相对于切换频率，长时间播放低质量视频会更加影响QoE</strong>（Assessing  effect sizes of influence factors towards a QoE model for HTTP adaptive streaming)</li>
-</ul>
-<blockquote>
-<p>stalling</p>
-</blockquote>
-<ul>
-<li>large buffer: 需要更多的内存（对于移动设备不合适） &amp; 更长的初始化等待</li>
-</ul>
-<h3 id="parameters-of-adaptation-algo"><a href="#parameters-of-adaptation-algo" class="headerlink" title="parameters of adaptation algo."></a>parameters of adaptation algo.</h3><p>当前常见的算法多采用如下几个系统参数来作为adaptation algo.的输入参数，<strong>预测带宽</strong>、<strong>video buffer size</strong>等。下面结合多种adaptation algo.来介绍这几个参数的运用，</p>
-<blockquote>
-<p>bandwidth estimation algo.</p>
-</blockquote>
-<ul>
-<li>（paper: Review of bandwidth estimation tools and application to bandwidth adaptive video streaming)</li>
-<li>可以分为passive &amp; active measurement两种预测方式，active measurement需要额外的probe packet，HAS多是采用passive的方式</li>
-</ul>
-<blockquote>
-<p>adaptation algo.</p>
-</blockquote>
-<p>具体的adaptation algo.以后会分专题讲解，此文只讲一些概括性的东西。由于其发展的很快，所以我都是重点关注些最新的算法。</p>
-<ul>
-<li>Pipelined DASH: several segment can be requested at a time</li>
-</ul>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>国庆假期看了些关于HAS领域概括性的文章，特将研究热点总结出来，供交流讨论及自己以后翻看。</p>
-]]></content>
-    </entry>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
     
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
   
   
-</search>
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"nicetony"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("8Rvuz2yLVyjHLNpUrAcYIglX-gzGzoHsz", "qXlJeL80svyONjcQyGhbaLQr");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+  
+
+</body>
+</html>
