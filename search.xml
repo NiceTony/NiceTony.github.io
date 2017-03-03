@@ -46,7 +46,7 @@ hexo d == hexo deploy
     </entry>
     
     <entry>
-      <title><![CDATA[HAS（HTTP Adaptive Streaming）研究热点总结]]></title>
+      <title><![CDATA[【HAS】HAS（HTTP Adaptive Streaming）研究热点总结]]></title>
       <url>http://yoursite.com/2016/10/15/research%20point%20on%20HAS/</url>
       <content type="html"><![CDATA[<p>HAS的初衷就是为了提高用户观看视频的体验，充分利用带宽状况来提供质量更好的视频。所以，关于HAS的研究以及部署，也都是围绕着提高用户的QoE(quality of experience)来做。总结下来有以下3个的研究方向：<strong>服务器</strong>、<strong>网络</strong>、<strong>客户端</strong>。下面就从这3个方面做详细的介绍。<br><a id="more"></a></p>
 <h2 id="Part-1-服务器端"><a href="#Part-1-服务器端" class="headerlink" title="Part 1: 服务器端"></a>Part 1: 服务器端</h2><hr>
