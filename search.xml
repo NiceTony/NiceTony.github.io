@@ -5,7 +5,7 @@
     
     <entry>
       <title><![CDATA[【HAS】DASH库libdash代码结构解析]]></title>
-      <url>http://yoursite.com/2017/03/04/%E3%80%90HAS%E3%80%91DASH%E5%BA%93libdash%E4%BB%A3%E7%A0%81%E7%BB%93%E6%9E%84%E8%A7%A3%E6%9E%90/</url>
+      <url>http://yoursite.com/2017/03/04/002/</url>
       <content type="html"><![CDATA[<p><strong>libdash</strong>是bitmovin公司开源的一个DASH库，完整实现了DASH协议，可以在<a href="https://github.com/bitmovin/libdash" target="_blank" rel="external">Github</a>上获取其代码。同时，该开源库还基于QT开发了一个播放器，之前做DASH自适应算法的时候，在该实例播放器上实现过算法，也对该播放器的代码结构较为熟悉，特记录下来，本文将主要针对设计自适应算法部分的代码。</p>
 <a id="more"></a>
 <h3 id="整体结构"><a href="#整体结构" class="headerlink" title="整体结构"></a>整体结构</h3><p><img src="http://oe1w1bbwt.bkt.clouddn.com/blog/libdash/libdash.png" alt="enter image description here"></p>
@@ -42,7 +42,7 @@
     
     <entry>
       <title><![CDATA[【生活感悟】Github博客一些常用操作]]></title>
-      <url>http://yoursite.com/2017/01/11/%E3%80%90%E7%94%9F%E6%B4%BB%E6%84%9F%E6%82%9F%E3%80%91Github%E5%8D%9A%E5%AE%A2%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/</url>
+      <url>http://yoursite.com/2017/01/11/003/</url>
       <content type="html"><![CDATA[<p>之前还一直觉得自己在别的平台上发布博客要方便些，自己要管理的话比较麻烦，好久没有写博客，今晚写了一篇博客之后，发现其实并没有那么复杂。之前还担心环境迁移的问题，现在也成功解决了，所以决定以后就在自己的空间来更新博客了，满满的Geek范，主要是还没有广告。这边文章主要记录一些更新博客中常用的操作，供今后更新时候查阅。</p>
 <a id="more"></a>
 <h2 id="迁移环境"><a href="#迁移环境" class="headerlink" title="迁移环境"></a>迁移环境</h2><p>本篇文章不涉及到如何在GitHub上搭建个人博客，如果需要的话可以参考教程<a href="http://wuxiaolong.me/2015/07/31/build-blog-by-hexo/" target="_blank" rel="external">吴小龙的博客</a>，这里只涉及到建好之后的一些常用操作。</p>
@@ -67,7 +67,7 @@ hexo d == hexo deploy
     
     <entry>
       <title><![CDATA[【生活感悟】在创业公司实习的这20天]]></title>
-      <url>http://yoursite.com/2017/01/11/%E3%80%90%E7%94%9F%E6%B4%BB%E6%84%9F%E6%82%9F%E3%80%91%E5%9C%A8%E5%88%9B%E4%B8%9A%E5%85%AC%E5%8F%B8%E5%AE%9E%E4%B9%A0%E7%9A%84%E8%BF%9920%E5%A4%A9/</url>
+      <url>http://yoursite.com/2017/01/11/004/</url>
       <content type="html"><![CDATA[<p>从2016-12-19号开始去师兄的公司实习，当时师兄和导师征求了下意见，老师说我没有问题的话就可以过去，然后我就开始了在师兄公司的实习经历，算是自己职业生涯中第一份履历了，最近也颇有一些感悟，所以记录下来。</p>
 <a id="more"></a>
 <h2 id="一些基本的事情"><a href="#一些基本的事情" class="headerlink" title="一些基本的事情"></a>一些基本的事情</h2><p>从北大到公司需要一个小时，早上理论上需要9:30到公司，开始我都是9点多点儿到，后来越来越晚，现在经常10点到的情况也是有的。公司在中关村东升科技园，东升科技园应该算是科技创新企业集中的园区，我们所在的泰利驿站算是初创企业的集中营，里边零零散散的分布着很多的公司，公司在泰利驿站里占据着西北角，现在大概有9个工位的样子，公司有4名核心技术人员，3名实习生，和两名负责市场的师姐。在公司吃饭是有一些贵的，大概在15-20之间，总体要比在学校吃贵80%的样子。在公司我终于坐上了喜欢的工位，要是在实验室也有这么宽敞的工位就好了。</p>
